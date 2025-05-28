@@ -82,3 +82,72 @@ Creates a new user account with the provided information and returns an authenti
 - The password is hashed before storing in the database
 - A JWT token is generated and returned upon successful registration
 - Email addresses must be unique
+
+## User Login Endpoint
+
+### POST /users/login
+
+This endpoint allows users to authenticate and login to the application.
+
+#### Description
+
+Authenticates a user with email and password, and returns an authentication token.
+
+#### Request
+
+- **URL**: `/users/login`
+- **Method**: `POST`
+- **Content-Type**: `application/json`
+
+#### Request Body
+
+| Field | Type | Description | Validation |
+|-------|------|-------------|------------|
+| email | String | User's email address | Must be a valid email format |
+| password | String | User's password | Minimum 6 characters |
+
+#### Example Request
+
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
+```
+
+#### Responses
+
+##### Success Response
+
+- **Status Code**: `200 OK`
+- **Content**:
+
+```json
+{
+  "token": "jwt_authentication_token",
+  "user": {
+    "_id": "user_id",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "user@example.com"
+  }
+}
+```
+
+##### Error Response
+
+- **Status Code**: `401 Unauthorized`
+- **Content**:
+
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+
+#### Notes
+
+- The provided password is compared with the hashed password stored in the database
+- A JWT token is generated and returned upon successful authentication

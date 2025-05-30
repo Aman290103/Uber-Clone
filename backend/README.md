@@ -1,5 +1,104 @@
 # UberClone API Documentation
 
+## Captain Registration Endpoint
+
+### POST /captain/register
+
+This endpoint allows new captains to register in the application.
+
+#### Description
+
+Creates a new captain account with the provided information and returns an authentication token.
+
+#### Request
+
+- **URL**: `/captain/register`
+- **Method**: `POST`
+- **Content-Type**: `application/json`
+
+#### Request Body
+
+| Field | Type | Description | Validation |
+|-------|------|-------------|------------|
+| fullname.firstname | String | Captain's first name | Required |
+| fullname.lastname | String | Captain's last name | Required |
+| email | String | Captain's email address | Valid email format |
+| password | String | Account password | Min 6 characters |
+| phoneNumber | String | Contact number | Min 10 characters |
+| vehicle.vehicleType | String | Type of vehicle | Must be 'car', 'motorcycle', or 'auto' |
+| vehicle.plate | String | Vehicle license plate | Required |
+| vehicle.color | String | Vehicle color | Min 3 characters |
+| vehicle.capacity | Number | Vehicle passenger capacity | Min 1 |
+
+#### Example Request
+
+```json
+{
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
+  "email": "john.doe@example.com",
+  "password": "password123",
+  "phoneNumber": "1234567890",
+  "vehicle": {
+    "vehicleType": "car",
+    "plate": "ABC123",
+    "color": "black",
+    "capacity": 4
+  }
+}
+```
+
+#### Responses
+
+##### Success Response
+
+- **Status Code**: `200 OK`
+- **Content**:
+
+```json
+{
+  "token": "jwt-token-here",
+  "captain": {
+    "_id": "captain-id",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "john.doe@example.com",
+    "phoneNumber": "1234567890"
+  }
+}
+```
+
+##### Error Response
+
+- **Status Code**: `400 Bad Request` (Email already registered)
+- **Content**:
+
+```json
+{
+  "message": "Captain already registered"
+}
+```
+
+- **Status Code**: `400 Bad Request` (Validation errors)
+- **Content**:
+
+```json
+{
+  "errors": [
+    {
+      "type": "field",
+      "msg": "First name is required",
+      "path": "fullname.firstname",
+      "location": "body"
+    }
+  ]
+}
+```
+
 ## User Registration Endpoint
 
 ### POST /users/register

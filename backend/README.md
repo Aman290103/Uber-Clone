@@ -1,6 +1,6 @@
 # UberClone API Documentation
 
-## Captain Registration Endpoint
+## Captain Endpoints
 
 ### POST /captain/register
 
@@ -98,6 +98,179 @@ Creates a new captain account with the provided information and returns an authe
   ]
 }
 ```
+
+### POST /captain/login
+
+This endpoint allows captains to authenticate and login to the application.
+
+#### Description
+
+Authenticates a captain with email and password, and returns an authentication token.
+
+#### Request
+
+- **URL**: `/captain/login`
+- **Method**: `POST`
+- **Content-Type**: `application/json`
+
+#### Request Body
+
+| Field | Type | Description | Validation |
+|-------|------|-------------|------------|
+| email | String | Captain's email address | Must be a valid email format |
+| password | String | Captain's password | Minimum 6 characters |
+
+#### Example Request
+
+```json
+{
+  "email": "captain@example.com",
+  "password": "password123"
+}
+```
+
+#### Responses
+
+##### Success Response
+
+- **Status Code**: `200 OK`
+- **Content**:
+
+```json
+{
+  "token": "jwt_authentication_token",
+  "captain": {
+    "_id": "captain_id",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "captain@example.com",
+    "phoneNumber": "1234567890"
+  }
+}
+```
+
+##### Error Response
+
+- **Status Code**: `401 Unauthorized`
+- **Content**:
+
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+
+#### Notes
+
+- The provided password is compared with the hashed password stored in the database
+- A JWT token is generated and returned upon successful authentication
+- The token is also set as an HTTP-only cookie
+
+### GET /captain/profile
+
+This endpoint allows authenticated captains to retrieve their profile information.
+
+#### Description
+
+Returns the profile information of the currently authenticated captain.
+
+#### Request
+
+- **URL**: `/captain/profile`
+- **Method**: `GET`
+- **Headers**: 
+  - `Authorization: Bearer <token>` (required if token not in cookie)
+
+#### Responses
+
+##### Success Response
+
+- **Status Code**: `200 OK`
+- **Content**:
+
+```json
+{
+  "captain": {
+    "_id": "captain_id",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "captain@example.com",
+    "phoneNumber": "1234567890",
+    "vehicle": {
+      "vehicleType": "car",
+      "plate": "ABC123",
+      "color": "black",
+      "capacity": 4
+    },
+    "status": "inactive"
+  }
+}
+```
+
+##### Error Response
+
+- **Status Code**: `401 Unauthorized`
+- **Content**:
+
+```json
+{
+  "message": "Authentication failed"
+}
+```
+
+#### Notes
+
+- Requires authentication via JWT token
+- Returns the captain object without sensitive information
+
+### GET /captain/logout
+
+This endpoint allows captains to logout from the application.
+
+#### Description
+
+Invalidates the current authentication token by adding it to a blacklist.
+
+#### Request
+
+- **URL**: `/captain/logout`
+- **Method**: `GET`
+- **Headers**: 
+  - `Authorization: Bearer <token>` (required if token not in cookie)
+
+#### Responses
+
+##### Success Response
+
+- **Status Code**: `200 OK`
+- **Content**:
+
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+##### Error Response
+
+- **Status Code**: `401 Unauthorized`
+- **Content**:
+
+```json
+{
+  "message": "Authentication failed"
+}
+```
+
+#### Notes
+
+- The token is added to a blacklist with a 24-hour TTL
+- The cookie containing the token is cleared
+- Subsequent requests with the blacklisted token will be rejected
 
 ## User Registration Endpoint
 

@@ -1,5 +1,7 @@
-import React , {useState} from 'react'
-import { Link, Links } from 'react-router-dom'
+import React , {useContext, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { UserDataContext } from '../context/userContext'
 
 const UserSignup = () => {
       const [email, setEmail] = useState('')
@@ -7,23 +9,59 @@ const UserSignup = () => {
       const [phone, setPhone]=useState('')
       const [FirstName, setFirstName] = useState('')
       const [LastName, setLastName] = useState('')
-      const [userData,setUserData] = useState({})
-      const submitHandler = (e)=>{
-            e.preventDefault()
-            setUserData({
-                  username:{
-                         FirstName:FirstName,
-                        LastName:LastName,
-                  },
-                   phone:phone,
-                  email:email,
-                  password:password 
-            })
-            
+      const [user,setUser] = useContext(UserDataContext)
 
-            setEmail('')
-            setPassword('')
-            setPhone('')
+     const  navigate = useNavigate()
+
+
+
+      const submitHandler = async (e)=>{
+            e.preventDefault()
+            try {
+                // Client-side validation
+                if (!email) {
+                    alert("Email is required");
+                    return;
+                }
+                
+                if (!password || password.length < 6) {
+                    alert("Password must be at least 6 characters");
+                    return;
+                }
+                
+                if (!FirstName || FirstName.length < 3) {
+                    alert("First name must be at least 3 characters");
+                    return;
+                }
+                
+                const newUser = {
+                    fullname:{
+                             firstname: FirstName,
+                             lastname: LastName
+                    },
+                    email: email,
+                    password: password 
+                }
+                
+                console.log("Sending data:", newUser);
+                
+                const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUser);
+                
+                console.log("Response:", response.data);
+                
+                if(response.status === 200 || response.status === 201){
+                   const data = response.data;
+                   setUser(data.user);
+                   navigate('/home');
+                   
+                   setEmail('');
+                   setPassword('');
+                   setPhone('');
+                }
+            } catch (error) {
+                console.error("Registration error:", error);
+                alert("Registration failed: " + (error.response?.data?.message || error.message));
+            }
       }
 
       

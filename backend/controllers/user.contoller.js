@@ -5,33 +5,46 @@ const { validationResult } = require('express-validator');
 
 
 module.exports.registerUser = async (req,res,next)=>{
+      try {
+            const errors = validationResult(req);
+            if(!errors.isEmpty()){
+                  return res.status(400).json({errors: errors.array() });
+            }
 
-      const errors = validationResult(req);
-      if(!errors.isEmpty()){
-            return res.status(400).json({errors: errors.array() });
+            console.log("Request body:", req.body);
+            
+            const{fullname, email, password} = req.body;
+            
+            if (!fullname || !fullname.firstname) {
+                  return res.status(400).json({message: 'First name is required'});
+            }
 
+            if (!email) {
+                  return res.status(400).json({message: 'Email is required'});
+            }
+
+            const hashedPassword = await userModel.hashPassword(password);
+
+            const isUserAlreadyExist = await userModel.findOne({email});
+
+            if(isUserAlreadyExist){
+                  return res.status(400).json({message: 'User already exists'});
+            }
+            
+            const user = await userService.createUser({
+                  firstname: fullname.firstname,
+                  lastname: fullname.lastname || '',
+                  email,
+                  password: hashedPassword
+            });
+
+            const token = user.generateAuthToken();
+
+            res.status(200).json({ token, user});
+      } catch (error) {
+            console.error("Registration error:", error);
+            res.status(500).json({message: 'Registration failed', error: error.message});
       }
-
-      const{fullname, email, password} = req.body;
-
-      const hashedPassword = await userModel.hashPassword(password);
-
-      const isUserAlreadyExist = await userModel.findOne({email});
-
-      if(isUserAlreadyExist){
-            return res.status(400).json({message: 'User already exists'});
-      }
-      const user = await userService.createUser({
-            firstname:fullname.firstname,
-            lastname:fullname.lastname,
-            email,
-            password: hashedPassword
-      });
-
-      const token = user.generateAuthToken();
-
-      res.status(200).json({ token, user});
-
 }
 
 module.exports.loginUser = async (req, res, next)=>{

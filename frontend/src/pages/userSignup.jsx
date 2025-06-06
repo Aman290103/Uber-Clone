@@ -19,20 +19,6 @@ const UserSignup = () => {
             e.preventDefault()
             try {
                 // Client-side validation
-                if (!email) {
-                    alert("Email is required");
-                    return;
-                }
-                
-                if (!password || password.length < 6) {
-                    alert("Password must be at least 6 characters");
-                    return;
-                }
-                
-                if (!FirstName || FirstName.length < 3) {
-                    alert("First name must be at least 3 characters");
-                    return;
-                }
                 
                 const newUser = {
                     fullname:{

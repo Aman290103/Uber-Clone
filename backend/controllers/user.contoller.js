@@ -33,7 +33,7 @@ module.exports.registerUser = async (req,res,next)=>{
             
             const user = await userService.createUser({
                   firstname: fullname.firstname,
-                  lastname: fullname.lastname || '',
+                  lastname: fullname.lastname ,
                   email,
                   password: hashedPassword
             });
